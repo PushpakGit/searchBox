@@ -2,13 +2,9 @@ import React, { Component } from 'react';
 import axios from 'axios';
 
 import List from './List';
+import { connect } from 'react-redux';
 
 class FilteredList extends Component{
-
-    state = {
-        initialItems:[],
-        items: []
-    }
 
     render(){
         return (
@@ -17,10 +13,12 @@ class FilteredList extends Component{
             <fieldset className="form-group">
             <input type="text" 
                    placeholder="Search Country"
-                   onChange={this.filterList}/>
+                //    onChange={this.filterList}
+                onChange={(event) => this.props.onInputChange(event.target.value)} 
+                />
             </fieldset>
             </form>
-          <List items={this.state.items}/>
+          <List items={this.props.items}/>
           </div>
         );
       }
@@ -33,26 +31,37 @@ class FilteredList extends Component{
                     return country.name;
                 });
 
-                console.log(initialItems)
-                this.setState({initialItems: initialItems});
-                this.setState({items: this.state.initialItems})
+                // console.log(initialItems)
+                // this.setState({initialItems: initialItems});
+                // this.setState({items: this.state.initialItems})
+                this.props.fetchCountry(initialItems);
             });
-            
       }
 
-      filterList = (event) => {
+    //   filterList = (event) => {
           
-        var updatedList = this.state.initialItems;
-        updatedList = updatedList.filter(function(item){
-          return item.toLowerCase().search(
-            event.target.value.toLowerCase()) !== -1;
-        });
-        this.setState({items: updatedList});       
+    //     var updatedList = this.state.initialItems;
+    //     updatedList = updatedList.filter(function(item){
+    //       return item.toLowerCase().search(
+    //         event.target.value.toLowerCase()) !== -1;
+    //     });
+    //     this.setState({items: updatedList});       
         
-      }
+    //   }
 }
 
-  
+const mapStateToProps = (state) => {
+    return{
+        items : state.items,
+        initialItems : state.initialItems
+    }
+}  
 
+const mapDispatchToProps = (dispatch) => {
+    return{
+        onInputChange : (inputVal) => dispatch({ type:'SEARCH', searchKey:inputVal }),
+        fetchCountry : (Country) => dispatch({ type:'FETCH' , countries: Country})
+    }
+}
   
-export default FilteredList;
+export default connect(mapStateToProps,mapDispatchToProps)(FilteredList);
